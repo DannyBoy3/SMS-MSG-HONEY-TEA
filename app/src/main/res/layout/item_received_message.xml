@@ -48,6 +48,7 @@
             android:visibility="gone" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/thread_message_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,6 +56,21 @@
             android:layout_toEndOf="@+id/thread_message_sender_photo"
             android:autoLink="email|web"
             android:background="@drawable/item_received_background"
+            android:padding="@dimen/normal_margin"
+            android:textSize="@dimen/normal_text_size"
+            tools:text="Received message" />
+
+
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/thread_message_body_malicious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/thread_mesage_attachments_holder"
+            android:layout_toEndOf="@+id/thread_message_sender_photo"
+            android:linksClickable="false"
+            android:autoLink="none"
+            android:background="@drawable/item_received_background_alert"
             android:padding="@dimen/normal_margin"
             android:textSize="@dimen/normal_text_size"
             tools:text="Received message" />

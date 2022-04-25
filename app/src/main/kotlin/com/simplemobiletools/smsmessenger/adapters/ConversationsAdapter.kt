@@ -295,6 +295,7 @@ class ConversationsAdapter(
     }
 
     private fun setupView(view: View, conversation: Conversation) {
+        //sitas nutinka kai loadini threadus
         view.apply {
             val smsDraft = drafts[conversation.threadId]
             draft_indicator.beVisibleIf(smsDraft != null)

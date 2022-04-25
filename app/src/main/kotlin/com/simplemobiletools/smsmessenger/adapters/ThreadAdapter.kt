@@ -28,6 +28,7 @@ import com.simplemobiletools.commons.extensions.*
 import com.simplemobiletools.commons.helpers.SimpleContactsHelper
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import com.simplemobiletools.commons.views.MyRecyclerView
+import com.simplemobiletools.smsmessenger.App
 import com.simplemobiletools.smsmessenger.R
 import com.simplemobiletools.smsmessenger.activities.NewConversationActivity
 import com.simplemobiletools.smsmessenger.activities.SimpleActivity
@@ -37,6 +38,7 @@ import com.simplemobiletools.smsmessenger.extensions.deleteMessage
 import com.simplemobiletools.smsmessenger.extensions.getContactFromAddress
 import com.simplemobiletools.smsmessenger.extensions.updateLastConversationMessage
 import com.simplemobiletools.smsmessenger.helpers.*
+import com.simplemobiletools.smsmessenger.honeytea.MaliciousHostnameRegistry
 import com.simplemobiletools.smsmessenger.models.*
 import kotlinx.android.synthetic.main.item_attachment_image.view.*
 import kotlinx.android.synthetic.main.item_received_message.view.*
@@ -50,6 +52,7 @@ import kotlinx.android.synthetic.main.item_thread_success.view.*
 class ThreadAdapter(
     activity: SimpleActivity, var messages: ArrayList<ThreadItem>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit
 ) : MyRecyclerViewAdapter(activity, recyclerView, itemClick) {
+    private var registry: MaliciousHostnameRegistry
     private var fontSize = activity.getTextSize()
 
     @SuppressLint("MissingPermission")
@@ -57,6 +60,10 @@ class ThreadAdapter(
 
     init {
         setupDragListener(true)
+
+        //fetching url registry
+        val app = activity.application as App
+        this.registry = app.registry
     }
 
     override fun getActionMenuId() = R.menu.cab_thread
@@ -242,14 +249,23 @@ class ThreadAdapter(
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun setupView(holder: ViewHolder, view: View, message: Message) {
         view.apply {
+
+            val containsMaliciousUrl = registry.checkMessageForMaliciousUrl(message)
+            var threadMessageBody =  thread_message_body
+            if (containsMaliciousUrl) {
+                threadMessageBody = thread_message_body_malicious
+            }
+            threadMessageBody.visibility = View.VISIBLE
+
             thread_message_holder.isSelected = selectedKeys.contains(message.hashCode())
-            thread_message_body.apply {
+            threadMessageBody.apply {
                 text = message.body
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
             }
-            thread_message_body.beVisibleIf(message.body.isNotEmpty())
+            threadMessageBody.beVisibleIf(message.body.isNotEmpty())
 
             if (message.isReceivedMessage()) {
                 thread_message_sender_photo.beVisible()
@@ -261,8 +277,8 @@ class ThreadAdapter(
                         }
                     }
                 }
-                thread_message_body.setTextColor(textColor)
-                thread_message_body.setLinkTextColor(context.getProperPrimaryColor())
+                threadMessageBody.setTextColor(textColor)
+                threadMessageBody.setLinkTextColor(context.getProperPrimaryColor())
 
                 if (!activity.isFinishing && !activity.isDestroyed) {
                     SimpleContactsHelper(context).loadContactImage(message.senderPhotoUri, thread_message_sender_photo, message.senderName)
@@ -270,19 +286,19 @@ class ThreadAdapter(
             } else {
                 thread_message_sender_photo?.beGone()
                 val background = context.getProperPrimaryColor()
-                thread_message_body.background.applyColorFilter(background)
+                threadMessageBody.background.applyColorFilter(background)
 
                 val contrastColor = background.getContrastColor()
-                thread_message_body.setTextColor(contrastColor)
-                thread_message_body.setLinkTextColor(contrastColor)
+                threadMessageBody.setTextColor(contrastColor)
+                threadMessageBody.setLinkTextColor(contrastColor)
             }
 
-            thread_message_body.setOnLongClickListener {
+            threadMessageBody.setOnLongClickListener {
                 holder.viewLongClicked()
                 true
             }
 
-            thread_message_body.setOnClickListener {
+            threadMessageBody.setOnClickListener {
                 holder.viewClicked(message)
             }
 
@@ -387,6 +403,18 @@ class ThreadAdapter(
                     thread_message_play_outline.beVisibleIf(mimetype.startsWith("video/"))
                 }
             }
+
+
+//            if (containsMaliciousUrl) {
+//                thread_message_body.autoLinkMask = 0
+//                thread_message_body.linksClickable = false
+//                thread_message_body.setTextColor(R.color.md_red_200)
+//            } else {
+//
+////                thread_message_body.autoLinkMask = 3
+////                thread_message_body.linksClickable = true
+//            }
+
         }
     }
 

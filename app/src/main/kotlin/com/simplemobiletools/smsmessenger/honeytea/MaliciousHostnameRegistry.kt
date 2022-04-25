@@ -1,6 +1,7 @@
 package com.simplemobiletools.smsmessenger.honeytea
 
 import android.content.Context
+import com.simplemobiletools.smsmessenger.models.Message
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -34,6 +35,15 @@ class MaliciousHostnameRegistry(val context: Context) {
             }
             writer.flush()
         }
+    }
+
+    fun checkMessageForMaliciousUrl(message: Message): Boolean {
+        for (host in cache) {
+            if (message.body.contains(host)) {
+                return true
+            }
+        }
+        return false
     }
 
 }

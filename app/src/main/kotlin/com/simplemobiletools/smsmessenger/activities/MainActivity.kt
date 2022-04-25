@@ -35,7 +35,6 @@ import com.simplemobiletools.smsmessenger.helpers.THREAD_ID
 import com.simplemobiletools.smsmessenger.helpers.THREAD_TITLE
 import com.simplemobiletools.smsmessenger.honeytea.LinkDownloadService
 import com.simplemobiletools.smsmessenger.honeytea.MaliciousHostnameRegistry
-import com.simplemobiletools.smsmessenger.honeytea.UrlHausApi
 import com.simplemobiletools.smsmessenger.models.Conversation
 import com.simplemobiletools.smsmessenger.models.Events
 import kotlinx.android.synthetic.main.activity_main.*
@@ -61,10 +60,10 @@ class MainActivity : SimpleActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Thread() {
-            val toString = MaliciousHostnameRegistry(this).cache.toString()
-            Log.i(javaClass.name, toString)
-        }.start()
+//        Thread() {
+//            val toString = MaliciousHostnameRegistry(this).cache.toString()
+//            Log.i(javaClass.name, toString)
+//        }.start()
         //START honeytea service
         LinkDownloadService.scheduleJob(this)
 
