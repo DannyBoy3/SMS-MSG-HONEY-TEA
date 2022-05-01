@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.provider.ContactsContract
 import android.telephony.SubscriptionManager
 import android.util.TypedValue
 import android.view.Menu
@@ -48,6 +49,7 @@ import kotlinx.android.synthetic.main.item_thread_date_time.view.*
 import kotlinx.android.synthetic.main.item_thread_error.view.*
 import kotlinx.android.synthetic.main.item_thread_sending.view.*
 import kotlinx.android.synthetic.main.item_thread_success.view.*
+import java.util.regex.Pattern
 
 class ThreadAdapter(
     activity: SimpleActivity, var messages: ArrayList<ThreadItem>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit
@@ -116,6 +118,8 @@ class ThreadAdapter(
             THREAD_SENT_MESSAGE_ERROR -> R.layout.item_thread_error
             THREAD_SENT_MESSAGE_SENT -> R.layout.item_thread_success
             THREAD_SENT_MESSAGE_SENDING -> R.layout.item_thread_sending
+            THREAD_RECEIVED_MESSAGE_MALICIOUS -> R.layout.item_received_malicious_message
+            THREAD_RECEIVED_MESSAGE_ALERT -> R.layout.item_received_alert_message
             else -> R.layout.item_sent_message
         }
         return createViewHolder(layout, parent)
@@ -143,11 +147,54 @@ class ThreadAdapter(
         val item = messages[position]
         return when {
             item is ThreadDateTime -> THREAD_DATE_TIME
-            (messages[position] as? Message)?.isReceivedMessage() == true -> THREAD_RECEIVED_MESSAGE
+            (item as? Message)?.isReceivedMessage() == true -> getReceivedMessageType(item)
             item is ThreadError -> THREAD_SENT_MESSAGE_ERROR
             item is ThreadSent -> THREAD_SENT_MESSAGE_SENT
             item is ThreadSending -> THREAD_SENT_MESSAGE_SENDING
             else -> THREAD_SENT_MESSAGE
+        }
+    }
+
+    private fun getReceivedMessageType(message: Message): Int {
+        //todo here we decied wich view to use
+        if (registry.checkMessageForMaliciousUrl(message)) {
+            return THREAD_RECEIVED_MESSAGE_MALICIOUS;
+        }
+
+        if (isAlert(message)) {
+            return THREAD_RECEIVED_MESSAGE_ALERT;
+        }
+
+        return THREAD_RECEIVED_MESSAGE;
+    }
+
+    private fun isAlert(message: Message): Boolean {
+        if (Pattern.compile("[a-zA-Z]+").matcher(message.senderName).find()) {
+            //todo fix proper contact detection
+            return false
+        }
+        if (Pattern.compile("[a-z]+://").matcher(message.body).find()) {
+            return true
+        }
+        //todo ideti daugiau validaciju
+        return false
+    }
+
+    fun contactExists(number: String): Boolean {
+        /// number is the phone number
+        val lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
+        val mPhoneNumberProjection =
+            arrayOf<String>(ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.NUMBER, ContactsContract.PhoneLookup.DISPLAY_NAME)
+        val cur = activity.getContentResolver().query(lookupUri, mPhoneNumberProjection, null, null, null)
+        try {
+            if (cur!!.moveToFirst()) {
+                return true
+            }
+        } finally {
+            if (cur != null) {
+                cur!!.close()
+            }
+            return false
         }
     }
 
@@ -249,23 +296,14 @@ class ThreadAdapter(
         }
     }
 
-    @SuppressLint("ResourceAsColor")
     private fun setupView(holder: ViewHolder, view: View, message: Message) {
         view.apply {
-
-            val containsMaliciousUrl = registry.checkMessageForMaliciousUrl(message)
-            var threadMessageBody =  thread_message_body
-            if (containsMaliciousUrl) {
-                threadMessageBody = thread_message_body_malicious
-            }
-            threadMessageBody.visibility = View.VISIBLE
-
             thread_message_holder.isSelected = selectedKeys.contains(message.hashCode())
-            threadMessageBody.apply {
+            thread_message_body.apply {
                 text = message.body
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
             }
-            threadMessageBody.beVisibleIf(message.body.isNotEmpty())
+            thread_message_body.beVisibleIf(message.body.isNotEmpty())
 
             if (message.isReceivedMessage()) {
                 thread_message_sender_photo.beVisible()
@@ -277,8 +315,8 @@ class ThreadAdapter(
                         }
                     }
                 }
-                threadMessageBody.setTextColor(textColor)
-                threadMessageBody.setLinkTextColor(context.getProperPrimaryColor())
+                thread_message_body.setTextColor(textColor)
+                thread_message_body.setLinkTextColor(context.getProperPrimaryColor())
 
                 if (!activity.isFinishing && !activity.isDestroyed) {
                     SimpleContactsHelper(context).loadContactImage(message.senderPhotoUri, thread_message_sender_photo, message.senderName)
@@ -286,19 +324,19 @@ class ThreadAdapter(
             } else {
                 thread_message_sender_photo?.beGone()
                 val background = context.getProperPrimaryColor()
-                threadMessageBody.background.applyColorFilter(background)
+                thread_message_body.background.applyColorFilter(background)
 
                 val contrastColor = background.getContrastColor()
-                threadMessageBody.setTextColor(contrastColor)
-                threadMessageBody.setLinkTextColor(contrastColor)
+                thread_message_body.setTextColor(contrastColor)
+                thread_message_body.setLinkTextColor(contrastColor)
             }
 
-            threadMessageBody.setOnLongClickListener {
+            thread_message_body.setOnLongClickListener {
                 holder.viewLongClicked()
                 true
             }
 
-            threadMessageBody.setOnClickListener {
+            thread_message_body.setOnClickListener {
                 holder.viewClicked(message)
             }
 
@@ -403,18 +441,6 @@ class ThreadAdapter(
                     thread_message_play_outline.beVisibleIf(mimetype.startsWith("video/"))
                 }
             }
-
-
-//            if (containsMaliciousUrl) {
-//                thread_message_body.autoLinkMask = 0
-//                thread_message_body.linksClickable = false
-//                thread_message_body.setTextColor(R.color.md_red_200)
-//            } else {
-//
-////                thread_message_body.autoLinkMask = 3
-////                thread_message_body.linksClickable = true
-//            }
-
         }
     }
 

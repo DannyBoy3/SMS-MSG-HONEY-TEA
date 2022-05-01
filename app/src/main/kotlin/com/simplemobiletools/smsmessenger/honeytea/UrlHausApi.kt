@@ -4,15 +4,14 @@ import android.util.Log
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.lang.Exception
 import java.net.HttpURLConnection
-import java.net.URI
 import java.net.URL
 import java.util.Collections.unmodifiableCollection
 
 class UrlHausApi {
 
     fun loadMaliciousHostnames(): Collection<String> {
+
         val url = URL("https://urlhaus.abuse.ch/downloads/text_recent/")
         val urlConnection: HttpURLConnection = url.openConnection() as HttpURLConnection
         val stream: InputStream = BufferedInputStream(urlConnection.getInputStream())
@@ -24,7 +23,7 @@ class UrlHausApi {
                 try {
                     result.add(getDomainName(url))
                 } catch (e: Exception) {
-                    Log.e(javaClass.name, e.message, e)
+                    Log.e(javaClass.name, url  + " " + e.message, e)
                 }
             }
         }

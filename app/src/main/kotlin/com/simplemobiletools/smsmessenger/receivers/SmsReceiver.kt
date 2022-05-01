@@ -16,6 +16,7 @@ import com.simplemobiletools.commons.helpers.SimpleContactsHelper
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import com.simplemobiletools.commons.models.PhoneNumber
 import com.simplemobiletools.commons.models.SimpleContact
+import com.simplemobiletools.smsmessenger.App
 import com.simplemobiletools.smsmessenger.R
 import com.simplemobiletools.smsmessenger.extensions.*
 import com.simplemobiletools.smsmessenger.helpers.refreshMessages
@@ -75,7 +76,12 @@ class SmsReceiver : BroadcastReceiver() {
                         refreshMessages()
                     }
 
-                    context.showReceivedMessageNotification(address, body, threadId, bitmap)
+                    val app = context.applicationContext as App
+
+                    val containsMaliciousUrl = app.registry.checkMessageForMaliciousUrl(body)
+                    if (!containsMaliciousUrl) {
+                        context.showReceivedMessageNotification(address, body, threadId, bitmap)
+                    }
                 }
             }
         }

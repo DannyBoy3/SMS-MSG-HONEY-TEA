@@ -37,9 +37,11 @@ class MaliciousHostnameRegistry(val context: Context) {
         }
     }
 
-    fun checkMessageForMaliciousUrl(message: Message): Boolean {
+    fun checkMessageForMaliciousUrl(message: Message) = checkMessageForMaliciousUrl(message.body)
+
+    fun checkMessageForMaliciousUrl(body: String): Boolean {
         for (host in cache) {
-            if (message.body.contains(host)) {
+            if (body.contains(host)) {
                 return true
             }
         }

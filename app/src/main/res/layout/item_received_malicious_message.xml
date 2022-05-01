@@ -9,6 +9,7 @@
     android:layout_marginBottom="@dimen/medium_margin"
     android:foreground="@drawable/selector"
     android:paddingStart="@dimen/activity_margin"
+    android:longClickable="false"
     android:paddingEnd="@dimen/activity_margin">
 
     <RelativeLayout
@@ -24,7 +25,7 @@
             android:id="@+id/thread_message_sender_photo"
             android:layout_width="@dimen/list_avatar_size"
             android:layout_height="@dimen/list_avatar_size"
-            android:layout_alignBottom="@+id/thread_message_body"
+            android:layout_alignBottom="@+id/thread_message_body_holder"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="@dimen/medium_margin"
             android:visibility="gone" />
@@ -47,16 +48,34 @@
             android:src="@drawable/ic_play_outline_vector"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/thread_message_body"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/thread_mesage_attachments_holder"
+        <LinearLayout
+            android:longClickable="false"
+            android:id="@+id/thread_message_body_holder"
             android:layout_toEndOf="@+id/thread_message_sender_photo"
-            android:autoLink="email|web"
-            android:background="@drawable/item_received_background"
-            android:padding="@dimen/normal_margin"
-            android:textSize="@dimen/normal_text_size"
-            tools:text="Received message" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/thread_message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/thread_mesage_attachments_holder"
+                android:layout_toEndOf="@+id/thread_message_sender_photo"
+                android:autoLink="none"
+                android:longClickable="false"
+                android:background="@drawable/item_received_background_danger"
+                android:linksClickable="false"
+                android:textSize="@dimen/normal_text_size"
+                tools:text="Received message" />
+
+            <TextView
+                android:longClickable="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="⚠️  message above contains malicious url ⚠️ "
+                android:textColor="@color/md_amber_900" />
+        </LinearLayout>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
