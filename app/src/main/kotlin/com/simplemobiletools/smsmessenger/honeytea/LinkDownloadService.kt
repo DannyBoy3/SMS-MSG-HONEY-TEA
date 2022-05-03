@@ -44,7 +44,7 @@ class LinkDownloadService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.i(javaClass.name, "Running job for fetching malicious urls")
         Thread {
-            val hostnames = UrlHausApi().loadMaliciousHostnames()
+            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
             MaliciousHostnameRegistry(this).save(hostnames)
         }.start()
         return true

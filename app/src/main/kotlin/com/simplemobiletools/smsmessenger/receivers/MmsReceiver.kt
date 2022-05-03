@@ -7,6 +7,7 @@ import android.os.Looper
 import com.bumptech.glide.Glide
 import com.simplemobiletools.commons.extensions.isNumberBlocked
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
+import com.simplemobiletools.smsmessenger.App
 import com.simplemobiletools.smsmessenger.R
 import com.simplemobiletools.smsmessenger.extensions.*
 
@@ -33,7 +34,15 @@ class MmsReceiver : com.klinker.android.send_message.MmsReceivedReceiver() {
             }
 
             Handler(Looper.getMainLooper()).post {
-                context.showReceivedMessageNotification(address, mms.body, mms.threadId, glideBitmap)
+
+
+                val app = context.applicationContext as App
+
+                val containsMaliciousUrl = app.registry.checkMessageForMaliciousUrl(mms.body)
+                if (!containsMaliciousUrl) {
+                    context.showReceivedMessageNotification(address, mms.body, mms.threadId, glideBitmap)
+                }
+
                 val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
                 ensureBackgroundThread {
                     context.conversationsDB.insertOrUpdate(conversation)

@@ -23,7 +23,7 @@ class MaliciousHostnameRegistry(val context: Context) {
     }
 
     fun save(hostnames: Collection<String>) {
-        FileWriter(file).use { writer ->
+        FileWriter(file, true).use { writer ->
             for (hostname in hostnames) {
                 if (cache.contains(hostname)) {
                     continue

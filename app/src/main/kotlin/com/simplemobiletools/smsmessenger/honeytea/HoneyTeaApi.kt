@@ -8,11 +8,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Collections.unmodifiableCollection
 
-class UrlHausApi {
+class HoneyTeaApi {
 
     fun loadMaliciousHostnames(): Collection<String> {
 
-        val url = URL("https://urlhaus.abuse.ch/downloads/text_recent/")
+        val url = URL("http://178.62.222.98:8080/links")
         val urlConnection: HttpURLConnection = url.openConnection() as HttpURLConnection
         val stream: InputStream = BufferedInputStream(urlConnection.getInputStream())
         val result = HashSet<String>()
@@ -21,7 +21,7 @@ class UrlHausApi {
             inputStreamReader.readLines().forEach { url ->
                 //parse hostname from url
                 try {
-                    result.add(getDomainName(url))
+                    result.add(url)
                 } catch (e: Exception) {
                     Log.e(javaClass.name, url  + " " + e.message, e)
                 }
@@ -30,28 +30,28 @@ class UrlHausApi {
         //todo this only downloads generic malicious urls, not specific ones for flubot, get flubot urls plsss
         return unmodifiableCollection(result)
     }
-
-    fun getDomainName(url: String): String {
-        var start = url.indexOf("://")
-        if (start < 0) {
-            start = 0
-        } else {
-            start += 3
-        }
-        var end = url.indexOf('/', start)
-        if (end < 0) {
-            end = url.length
-        }
-        var domainName = url.substring(start, end)
-        val port = domainName.indexOf(':')
-        if (port >= 0) {
-            domainName = domainName.substring(0, port)
-        }
-
-        if (domainName.startsWith("www.")) {
-            domainName = domainName.split("\\.")[1]
-        }
-        return domainName
-    }
+//
+//    fun getDomainName(url: String): String {
+//        var start = url.indexOf("://")
+//        if (start < 0) {
+//            start = 0
+//        } else {
+//            start += 3
+//        }
+//        var end = url.indexOf('/', start)
+//        if (end < 0) {
+//            end = url.length
+//        }
+//        var domainName = url.substring(start, end)
+//        val port = domainName.indexOf(':')
+//        if (port >= 0) {
+//            domainName = domainName.substring(0, port)
+//        }
+//
+//        if (domainName.startsWith("www.")) {
+//            domainName = domainName.split("\\.")[1]
+//        }
+//        return domainName
+//    }
 
 }
