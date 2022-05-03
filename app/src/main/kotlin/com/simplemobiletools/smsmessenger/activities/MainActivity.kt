@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Telephony
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -32,7 +33,9 @@ import com.simplemobiletools.smsmessenger.helpers.EXPORT_MIME_TYPE
 import com.simplemobiletools.smsmessenger.helpers.MessagesExporter
 import com.simplemobiletools.smsmessenger.helpers.THREAD_ID
 import com.simplemobiletools.smsmessenger.helpers.THREAD_TITLE
+import com.simplemobiletools.smsmessenger.honeytea.HoneyTeaApi
 import com.simplemobiletools.smsmessenger.honeytea.LinkDownloadService
+import com.simplemobiletools.smsmessenger.honeytea.MaliciousHostnameRegistry
 import com.simplemobiletools.smsmessenger.models.Conversation
 import com.simplemobiletools.smsmessenger.models.Events
 import kotlinx.android.synthetic.main.activity_main.*
@@ -59,25 +62,13 @@ class MainActivity : SimpleActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //todo remove
 //        Thread() {
-//            val httpclient: HttpClient = DefaultHttpClient()
-//            val httppost = HttpPost("http://www.yoursite.com/script.php")
-//
-//            try {
-//                // Add your data
-//                val nameValuePairs: MutableList<NameValuePair> = ArrayList<NameValuePair>(2)
-//                nameValuePairs.add(BasicNameValuePair("id", "12345"))
-//                nameValuePairs.add(BasicNameValuePair("stringdata", "Hi"))
-//                httppost.setEntity(UrlEncodedFormEntity(nameValuePairs))
-//
-//                // Execute HTTP Post Request
-//                val response: HttpResponse = httpclient.execute(httppost)
-//            } catch (e: ClientProtocolException) {
-//                // TODO Auto-generated catch block
-//            } catch (e: IOException) {
-//                // TODO Auto-generated catch block
-//            }
-//
+//            Log.i(javaClass.name, "Loading hostnames")
+//            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
+//            Log.i(javaClass.name, hostnames.toString())
+//            MaliciousHostnameRegistry(this).save(hostnames)
+//            Log.i(javaClass.name, "saved to db")
 //        }.start()
         //START honeytea service
         LinkDownloadService.scheduleJob(this)

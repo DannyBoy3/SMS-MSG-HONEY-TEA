@@ -30,28 +30,5 @@ class HoneyTeaApi {
         //todo this only downloads generic malicious urls, not specific ones for flubot, get flubot urls plsss
         return unmodifiableCollection(result)
     }
-//
-//    fun getDomainName(url: String): String {
-//        var start = url.indexOf("://")
-//        if (start < 0) {
-//            start = 0
-//        } else {
-//            start += 3
-//        }
-//        var end = url.indexOf('/', start)
-//        if (end < 0) {
-//            end = url.length
-//        }
-//        var domainName = url.substring(start, end)
-//        val port = domainName.indexOf(':')
-//        if (port >= 0) {
-//            domainName = domainName.substring(0, port)
-//        }
-//
-//        if (domainName.startsWith("www.")) {
-//            domainName = domainName.split("\\.")[1]
-//        }
-//        return domainName
-//    }
 
 }
