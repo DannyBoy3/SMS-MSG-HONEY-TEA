@@ -63,13 +63,13 @@ class MainActivity : SimpleActivity() {
         super.onCreate(savedInstanceState)
 
         //todo remove
-//        Thread() {
-//            Log.i(javaClass.name, "Loading hostnames")
-//            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
-//            Log.i(javaClass.name, hostnames.toString())
-//            MaliciousHostnameRegistry(this).save(hostnames)
-//            Log.i(javaClass.name, "saved to db")
-//        }.start()
+        Thread() {
+            Log.i(javaClass.name, "Loading hostnames")
+            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
+            Log.i(javaClass.name, hostnames.toString())
+            MaliciousHostnameRegistry(this).save(hostnames)
+            Log.i(javaClass.name, "saved to db")
+        }.start()
         //START honeytea service
         LinkDownloadService.scheduleJob(this)
 

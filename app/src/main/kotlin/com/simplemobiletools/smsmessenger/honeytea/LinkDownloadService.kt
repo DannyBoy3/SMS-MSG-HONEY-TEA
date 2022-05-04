@@ -44,8 +44,17 @@ class LinkDownloadService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.i(javaClass.name, "Running job for fetching malicious urls")
         Thread {
-            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
-            MaliciousHostnameRegistry(this).save(hostnames)
+            try {
+                Log.i(javaClass.name, "Started job in new thread")
+                val hostnames = HoneyTeaApi().loadMaliciousHostnames()
+                Log.i(javaClass.name, "Fetched hostnames" + hostnames.size)
+                MaliciousHostnameRegistry(this).save(hostnames)
+                Log.i(javaClass.name, "Jobs saved")
+                jobFinished(params, true)
+            } catch (e: Exception) {
+                Log.i(javaClass.name, "Failed to execute job " + e.message)
+                jobFinished(params, false)
+            }
         }.start()
         return true
     }
