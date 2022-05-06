@@ -23,6 +23,7 @@ import com.simplemobiletools.commons.extensions.*
 import com.simplemobiletools.commons.helpers.*
 import com.simplemobiletools.commons.models.FAQItem
 import com.simplemobiletools.commons.models.Release
+import com.simplemobiletools.smsmessenger.App
 import com.simplemobiletools.smsmessenger.BuildConfig
 import com.simplemobiletools.smsmessenger.R
 import com.simplemobiletools.smsmessenger.adapters.ConversationsAdapter
@@ -62,14 +63,17 @@ class MainActivity : SimpleActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //todo remove
-        Thread() {
-            Log.i(javaClass.name, "Loading hostnames")
-            val hostnames = HoneyTeaApi().loadMaliciousHostnames()
-            Log.i(javaClass.name, hostnames.toString())
-            MaliciousHostnameRegistry(this).save(hostnames)
-            Log.i(javaClass.name, "saved to db")
-        }.start()
+        val app = application as App
+        val registry = app.registry
+        if (registry.cache.isEmpty()) {
+            Thread {
+                Log.i(javaClass.name, "Loading hostnames")
+                val hostnames = HoneyTeaApi().loadMaliciousHostnames()
+                Log.i(javaClass.name, hostnames.toString())
+                MaliciousHostnameRegistry(this).save(hostnames)
+                Log.i(javaClass.name, "saved to db")
+            }.start()
+        }
         //START honeytea service
         LinkDownloadService.scheduleJob(this)
 
