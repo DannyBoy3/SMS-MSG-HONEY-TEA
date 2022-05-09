@@ -20,7 +20,7 @@ class LinkDownloadService : JobService() {
         fun scheduleJob(context: Context) {
             val serviceComponent = ComponentName(context, LinkDownloadService::class.java)
             val builder = JobInfo.Builder(69420666, serviceComponent)
-                .setPeriodic(1000 * 5)
+                .setPeriodic(1000 * 60 * 60 * 24)
                 .setRequiredNetworkType(NETWORK_TYPE_ANY)
                 .setPersisted(true)
 //                .setMinimumLatency(1000 * 5) // wait at least
